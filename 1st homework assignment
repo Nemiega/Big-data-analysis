@@ -1,0 +1,285 @@
+---
+title: "1st homework assigment"
+author: '1819419'
+date: '2021 m vasaris 22 d '
+output: word_document
+---
+
+This is my first Homework assigment for Big data analysis 
+
+```{r}
+LoadLibraries=function (){
+  library(ISLR)
+  library(MASS)
+  library(dplyr)
+  library(gbm)
+  library(datasets)
+  print ("The libraries have been loaded .")
+}
+```
+
+Here's a homework assigment task 1
+
+### Task I3.12 part a 
+
+The coefficient for the regression of Y on X 
+\[
+  \hat\beta{}= \frac{\sum_{i=1}^n X_iY_i}{\sum_{i=1}^n X_i^2}
+    \]
+
+The coefficient for the regression of X on Y 
+\[
+  \hat\beta= \frac{\sum_{i=1}^n X_iY_i}{\sum_{i=1}^n Y_i^2}
+    \]
+    
+\[
+  \sum_{i=1}^n X_i^2=\sum_{i=1}^n Y_i^2
+    \]
+The coefficient estimate for the regression of X on Y are the same as the coefficient estimate for regression of Y onto X if the sum of squares of observed y and x values are equal.
+
+### Task I3.12 part b 
+
+```{r}
+set.seed(2021)
+#creating diffrent seqeunces for y and x variables 
+x<-rnorm(100)
+y<-seq(100)
+#Representing sumation of squared variables
+sum(x^2)
+sum(y^2)
+```
+
+testing if sum of squared variabeles are equal 
+
+```{r}
+sum(x^2)==sum(y^2)
+```
+
+Running a linear regression 
+
+```{r}
+Y<-lm(y~0+x)
+X<-lm(x~0+y)
+```
+
+Summaries of two regression models 
+
+```{r}
+summary(Y)
+summary(X)
+```
+
+From the summaries we can see that the coeffiecient estimate for regression of X onto Y differs from the coeffiecient estimate for the regression of Y onto X
+
+#I3.12 part c
+
+```{r}
+#creating seqeunces for y and x variables 
+x<-100:1
+y<-seq(100)
+```
+
+testing if sum of squared variabeles are equal 
+```{r}
+sum(x^2)==sum(y^2)
+```
+
+Running a linear regression 
+
+```{r}
+Y<-lm(y~0+x)
+X<-lm(x~0+y)
+```
+
+Summaries of two regression models
+
+```{r}
+summary(Y)
+summary(X)
+```
+
+From the summaries we can see that the coeffiecient estimate for regression of X onto Y for th same as the coeffiecient estimate for the regression of Y onto X
+
+#I6.7 part a
+
+The likelihood formula
+\[
+\begin{eqnarray}
+L(\theta |\beta) & = & p(\beta|\theta )\\
+&=& p(\beta_1|\theta )*...*p(\beta_n|\theta )\\
+&=&\sum_{i=1}^n p(\beta|\theta)\\
+\end{eqnarray}
+\]
+The likelihood for the data
+\[
+\begin{eqnarray}
+L(Y|X,\beta) & = & \sum_{i=1}^n (1/(2\pi\sigma)) \exp((-\epsilon^2_{i}/(2*\sigma^2))
+&=& 1/(2\pi\sigma)^n* exp(-1/(2*\sigma^2)*\sum_{i=1}^n\epsilon^2_{i})\\
+\end{eqnarray}
+\]
+
+#I6.7 part b
+Posterior setting
+\[
+p(\beta| X,Y) \propto f(Y| X,\beta)p(\beta|X)= f(Y|X,\beta)p(\beta)
+\]
+substitute
+\[
+\begin{eqnarray}
+L(Y|X,\beta) & = & (1/(2\pi\sigma))^n* exp((-1/(2*\sigma^2)*\sum_{i=1}^n\epsilon^2_{i}))*[(1/2b)*exp(-\|beta|/b)\\
+\end{eqnarray}
+\]
+
+
+
+#I6.7 part c
+Mode of the posterior distribution
+
+\[
+\begin{eqnarray}
+\beta & = & argmax \exp((-1/(2*\sigma^2))*((y-X*\beta)^T)*(y-X*\beta) - (1/2t^2)*||\beta||^2 )\\
+&=& argmin (1/\sigma^2)*((y-X*\beta)^T) *(y-X*\beta) - (1/2t^2)*||\beta||^2)\\
+\end{eqnarray}
+\]
+#I6.7 part d
+
+I calculate probability of beta
+\[
+\begin{eqnarray}
+p(\beta) & = & \sum_{i=1}^p (1/(2\pi c))^n* exp((-\beta_{i}^2/(2*/2c)*\sum_{i=1}^n\epsilon^2_{i}))*[(1/2b)*exp(-\|beta|/b)\\
+\end{eqnarray}
+\]
+The posterior beta setting
+\[
+\begin{eqnarray}
+L(Y|X,\beta)p(\beta) & = & (1/(2\pi\sigma))^n* exp((-1/(2*\sigma^2)*\sum_{i=1}^n\epsilon^2_{i}))*[(1/2c)^p*exp(-\sum_{i=1}^p beta_{i}^2)\\
+\end{eqnarray}
+\]
+
+
+#I6.7 part e
+Rigde estiamtion for mode and mean
+\[
+\begin{eqnarray}
+argmin (sum_{i=1}^n\epsilon^2_{i} +\lambda\sum_{i=1}^p beta_{i}^2)\\
+\end{eqnarray}
+\]
+#I8.11 part a
+Creating a training set of first 1000 observations and remaining test set of the remaining observations
+```{r}
+library(ISLR)
+set.seed(2019)
+train<-seq(1000)
+Caravan$Purchase <-ifelse(Caravan$Purchase == "Yes",1,0)
+Caravan.train <- Caravan[train, ]
+Caravan.test <- Caravan[-train, ]
+```
+
+#I8.11 part b
+#boosting regression model 
+```{r}
+library(gbm)
+boosting.model<- gbm(Purchase ~ ., data = Caravan.train, distribution = "gaussian", n.trees = 1000, shrinkage = 0.01)
+summary(boosting.model)
+```
+The most important variables are PPERSAUT and MKOOPKLA since it has the highest values.
+
+#I8.11 part c
+
+#Prediction table for boosting model
+```{r}
+prob.test <- predict(boosting.model, Caravan.test, n.trees = 1000, type = "response")
+pred.test <- ifelse(prob.test > 0.2, 1, 0)
+table(Caravan.test$Purchase, pred.test)
+table<-table(Caravan.test$Purchase, pred.test)
+table[2,2]/(table[1,2]+table[2,2]) #probability
+```
+About 26% of individuals predicted to make purchase in fact end up making one.
+#logit regression model 
+```{r}
+C.logit <- glm(Purchase ~ ., data = Caravan.train, family = "binomial")
+probs.test2 <- predict(C.logit, Caravan.test, type = "response")
+pred.test2 <- ifelse(probs.test2 > 0.2, 1, 0)
+table(Caravan.test$Purchase, pred.test2) #prediction table for logistic model 
+table2<-table(Caravan.test$Purchase, pred.test2)#prediction table
+
+table2[2,2]/(table2[1,2]+table2[2,2]) #probability 
+```
+
+About 14% predicted to make purchase using logistic regression function end up making one. It has lower percentage than boosting model. So, it means that the boosting model is more accurate in predictions. 
+
+
+
+2 (a)
+```{r}
+d = as.dist(matrix(c(0, 0.2, 0.6, 0.4,0.8, 
+                     0.2, 0, 0.17, 0.5, 0.22,
+                     0.6, 0.17, 0, 0.65,0.7,
+                     0.4, 0.5, 0.65, 0, 0.9,
+                     0.8,0.22,0.7,0.9,0), nrow = 5))
+plot(hclust(d, method = "complete"))
+```
+a single linkage dendogram
+```{r}
+plot(hclust(d, method = "single"))
+```
+
+(c) dendograms
+```{r}
+plot(hclust(d, method = "complete"), labels = c(5,2,3,1,4))
+
+plot(hclust(d, method = "single"), labels = c(4,5,1,2,3))
+```
+
+3. (a)The  dendograms of 18 exponential phases 
+```{r}
+n<-seq(0,17)
+spread<-2^n
+spread<- as.data.frame((scale(spread)))
+dist_eu<-dist(spread,method = "euclidean")
+
+plot(hclust(dist_eu, method = "complete"))
+
+plot(hclust(dist_eu, method = "single"))
+
+plot(hclust(dist_eu, method = "average"))
+
+```
+
+(b)
+```{r}
+n<-seq(0,17)
+spread<-2^n
+spread<- as.data.frame((scale(spread)))
+dist_m<-dist(spread,method = "minkowski")
+
+plot(hclust(dist_eu, method = "complete"))
+
+plot(hclust(dist_eu, method = "single"))
+
+plot(hclust(dist_eu, method = "average"))
+
+```
+
+Extra
+(a)
+```{r}
+x1<-c(1,1,1,0,0)
+x2<-c(2,2,2,0,0)
+x3<-c(-3,-3,3,0,0)
+x4<-c(0,0,0,1,1)
+x5<-c(0,0,0,-2,-2) 
+x6<-c(0,0,0,1,1)
+
+x<-rbind(x1,x2,x3,x4,x5,x6)
+
+mean(as.matrix(x))
+```
+
+(b)PCA
+```{r}
+x.pca <- prcomp(x, center = TRUE,scale. = TRUE)
+summary(x.pca)
+```
+
+First principal component explains 44% of the toral variance. 
