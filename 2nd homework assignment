@@ -1,0 +1,288 @@
+---
+title: "2hm"
+author: '1819419 Paulius Vencius'
+date: '2021 m geguÅ¾Ä 3 d '
+output: word_document
+---
+This is my second homework assignment for Big Data analysis
+10.3
+(a) i create a table and plot the observations
+```{r}
+set.seed(1999629)
+x1<-c(1,1,0,5,6,4)
+x2<-c(4,3,4,1,2,0)
+x<-cbind(x1,x2)
+plot(x)
+```
+
+(b) I assign a cluster label for each observation
+```{r}
+cl_label<-sample(2, nrow(x), replace=T)
+cl_label
+```
+
+(c)I compute the centroid for each cluster 
+```{r}
+centroid1<-c(mean(x[cl_label==1, 1]), mean(x[cl_label==1, 2]))
+centroid2<-c(mean(x[cl_label==2, 1]), mean(x[cl_label==2, 2]))
+centroid1
+```
+second centroid 
+```{r}
+centroid2
+```
+
+
+(d) I assign each obseravtion to the centroid, which is the closest, and plot a picture with clusters
+```{r}
+plot(x[,1], x[,2], col=(cl_label+1), pch=20, cex=2)
+points(centroid1[1], centroid1[2], col=1, pch=1)
+points(centroid2[1], centroid2[2], col=4, pch=3)
+```
+
+Calculating an Eucleadean distance 
+```{r}
+euclid = function(a, b) {
+  return(sqrt((a[1] - b[1])^2 + (a[2]-b[2])^2))
+}
+assign_labels = function(x, centroid1, centroid2) {
+  labels = rep(NA, nrow(x))
+  for (i in 1:nrow(x)) {
+    if (euclid(x[i,], centroid1) < euclid(x[i,], centroid2)) {
+      labels[i] = 1
+    } else {
+      labels[i] = 2
+    }
+  }
+  return(cl_label)
+}
+cl_label = assign_labels(x, centroid1, centroid2)
+cl_label
+```
+
+
+(e) I repeat the the c an d parts. The Eucleadean distance stops changing at the second repetition  
+```{r}
+centroid1<-c(mean(x[cl_label==1, 1]), mean(x[cl_label==1, 2]))
+centroid2<-c(mean(x[cl_label==2, 1]), mean(x[cl_label==2, 2]))
+
+euclid = function(a, b) {
+  return(sqrt((a[1] - b[1])^2 + (a[2]-b[2])^2))
+}
+assign_labels = function(x, centroid1, centroid2) {
+  cl_label = rep(NA, nrow(x))
+  for (i in 1:nrow(x)) {
+    if (euclid(x[i,], centroid1) < euclid(x[i,], centroid2)) {
+      cl_label[i] = 1
+    } else {
+      cl_label[i] = 2
+    }
+  }
+  return(cl_label)
+}
+cl_label = assign_labels(x, centroid1, centroid2)
+cl_label
+```
+
+
+(f) Plotting a new graph with diffrent observations 
+```{r}
+plot(x[,1], x[,2], col=(cl_label+1), pch=20, cex=2)
+points(centroid1[1], centroid1[2], col=2, pch=4)
+points(centroid2[1], centroid2[2], col=3, pch=4)
+```
+
+4.12
+(a)Creating a function, which prints out 2^3
+```{r}
+Power<-function(){
+  2^3
+}
+Power()
+```
+
+(b) Craeting a function, whcih allows me to to get any result x^a
+```{r}
+Power2<-function(x,a){
+  x^a
+}
+Power2(3,8)
+
+```
+
+(c) Results from the previous function
+```{r}
+Power2(10,3)
+Power2(8,17)
+Power2(131,3)
+```
+
+(d) Creating a function, which prints back the object 
+```{r}
+Power3<-function(x,a){
+  result<-x^a
+  return(result)
+}
+Power3(3,2)
+```
+
+(e)Plotting previous function
+```{r}
+x<-seq(1,10)
+plot(x, Power3(x, 2), ylab=" y", xlab="x", main="xy")
+```
+
+(f)Creating a function which plots the graph of x and x^3
+```{r}
+PlotPower = function(x, a) {
+    plot(x, Power3(x, a), ylab=" y", xlab="x", main="xy")
+}
+PlotPower(1:10, 3)
+```
+
+9.4
+I create a data set with non-linear separation
+```{r}
+#install.packages(e1071)
+library(e1071)
+set.seed(19990629)
+x <- rnorm(100)
+y <- 3* x^2 +6*x+ 1 + rnorm(100)
+class <- sample(100, 50)
+y[class] <- y[class] + 3
+y[-class] <- y[-class] - 3
+plot(x[class], y[class], col = "red", xlab = "X", ylab = "Y", ylim = c(-6, 30))
+points(x[-class], y[-class], col = "blue")
+```
+I create a support vector classifier in the training data with linear kernel and plot it 
+```{r}
+z <- rep(-1, 100)
+z[class] <- 1
+data <- data.frame(x = x, y = y, z = as.factor(z))
+train <- sample(100, 50)
+data.train <- data[train, ]
+data.test <- data[-train, ]
+svm.linear <- svm(z ~ ., data = data.train, kernel = "linear", cost = 10)
+plot(svm.linear, data.train)
+```
+
+
+Chech the prediction errors 
+```{r}
+table(predict = predict(svm.linear, data.train), truth = data.train$z)
+```
+The support vector makes 6 errors on the training data
+
+I fit support vector with polynomial kernel and plot it 
+```{r}
+svm.poly <- svm(z ~ ., data = data.train, kernel = "polynomial", cost = 10)
+plot(svm.poly, data.train)
+```
+
+Check the prediction error rates 
+```{r}
+table(predict = predict(svm.poly, data.train), truth = data.train$z)
+```
+The support vector makes 21 errors on the training data
+
+I fit support vector machine with radial kernel and gamma 1 
+
+```{r}
+svm.radial <- svm(z ~ ., data = data.train, kernel = "radial", gamma = 1, cost = 10)
+plot(svm.radial, data.train)
+```
+
+
+```{r}
+table(predict = predict(svm.radial, data.train), truth = data.train$z)
+```
+The support vector machine with a radial kernel makes 0 error
+
+I check how these support models work with the test data
+```{r}
+plot(svm.linear, data.test)
+plot(svm.poly, data.test)
+plot(svm.radial, data.test)
+```
+The svm with radial Kernial performs the most efficiently out of these three techniques, It has the lowest error rates. 
+
+
+Extra exercise
+1. Word count, installing packages
+```{r}
+#install.packages("readtext")
+#install.packages("wordcloud") # word-cloud generator 
+#install.packages("RColorBrewer") # color palettes
+library(readtext)
+library("wordcloud")
+library("RColorBrewer")
+library(dplyr) # Data wrangling & manipulationinstall.packages("tidytext")
+library(tidytext) # For unnest_tokens
+library(stringr) # For managing text
+library(ggplot2) # For data visualizations & graphs
+x<-readtext("C:/Users/Rimas/Desktop/Science/year 3/big data/2hm/Bonus/Bonus.docx")
+```
+
+Cleaning text 
+```{r}
+text<-x$text
+
+text <- paste(text, collapse = " ")
+text <- str_replace_all(text, pattern = '\"', replacement = "") # Remove slashes
+text <- str_replace_all(text, pattern = '\n', replacement = "") # Remove \n
+text <- str_replace_all(text, pattern = '\u0092', replacement = "'") #Replace with quote
+text <- str_replace_all(text, pattern = '\u0091', replacement = "'") #Replace with quote
+```
+
+Finding the most frequent words, take out stop words like: and, a and etc. Making graph of most repetitive words. 
+```{r}
+text_df <- tibble(Text = text) # tibble aka neater data frame
+text_words <- text_df %>% 
+  unnest_tokens(output = word, input = Text) 
+ 
+data(stop_words) # Stop words.
+   
+text_words  <- text_words  %>%
+     anti_join(stop_words) # Remove stop words in peter_words
+
+ # Word Counts:
+text_wordcounts <- text_words  %>% count(word, sort = TRUE)
+ 
+text_wordcounts
+
+text_wordcounts<- text_wordcounts%>%
+  filter(n>10)%>%
+  mutate(word=reorder(word,n))
+
+ggplot(data=text_wordcounts, aes(word,n))+geom_col(fill="darkred")+
+  coord_flip()+
+  labs(x="word\n", y="\n count", title="Frequent Words in Text \n")+
+  geom_text(aes(label=n), hjust=1.2, colour="white", fontface="bold")+
+    theme(plot.title = element_text(hjust = 0.5),
+          axis.title.x = element_text(face="bold", colour="darkblue", size=12),
+          axis.title.y = element_text(face="bold", colour="darkblue", size=12))
+```
+The word "time" is the most frequently used word in my text.
+
+Making a word cloud 
+```{r}
+wordcloud(words = text_wordcounts$word, freq = text_wordcounts$n, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+ Yes, the keywords are associated with the papers theme, which analysis wage diffence by working hours in Lithunia. 
+
+2.Barro-Lee example
+Uploading data 
+```{r}
+#install.packages("hdm")
+library("hdm")
+library(dplyr)
+data(GrowthData) # I cannot download data from this package 
+GrowthData<-read.csv("C:/Users/Rimas/Downloads/BL2013_MF1599_v2.2.csv")
+new_df <- GrowthData %>% group_by(BLcode) %>% sample_n(10) # random sample of 10 countries 
+```
+I am not sure if I am using a correct data 
+
+
+I also would like to thank you for this course. It was great.
